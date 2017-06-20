@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% set pagename = 'home' %}
+
+{% block title %}Catalog{% endblock %}
+
+{% block body %}
+    
+        <div class="row">
+            <div class="col-md-3">
+
+                <div class="page-header"><h1>Categories</h1></div>
+
+                {% if logged_in and ( user.admin or user.activated ) %}
+                <p><a href="{{ url_for('newTag') }}" class="btn btn-primary">New Category</a></p>
+                {% endif %}
+
+                <ul>
+                {% for tag in tags %}
+                    <li><a href="{{ url_for('viewTag', tag_name=tag.name) }}">{{ tag.name }}</a></li>
+                {% else %}
+                    <li>No categories here.</li>
+                {% endfor %}
+                </ul>
+            
+            </div>
+
+            <div class="col-md-9">
+                
+                <div class="page-header"><h1>Items <a href="{{ url_for('recentAtom') }}"><img src="{{ url_for('static', filename='img/feedicon.png') }}"></a></h1></div>
+
+                {% if logged_in and ( user.admin or user.activated ) %}
+                <p><a href="{{ url_for('newItem') }}" class="btn btn-primary">New Item</a></p>
+                {% endif %}
+
+                <ul>
+                {% for item in items %}
+                    <li>
+                        <a href="{{ url_for('viewItem', item_name=item.name, item_id=item.id) }}">{{ item.name }}</a>
+                        {% if item.tags %}{% set comma = joiner(", ") %}
+                        (
+                            {% for tag in item.tags %}
+                                {{- comma() }}<a href="{{ url_for('viewTag', tag_name=tag.name) }}">{{ tag.name }}</a>
+                            {%- endfor %}
+                        )
+                        {% endif %}
+                    </li>
+                {% else %}
+                    <li>No items here.</li>
+                {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+{% endblock %}

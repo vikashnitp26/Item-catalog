@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% if action == 'newTag' %}
+    {% set title_verb = 'New' %}
+{% elif action == 'editTag' %}
+    {% set title_verb = 'Edit' %}
+{% endif %}
+
+
+{% block title %}{{ title_verb }} Category{% endblock %}
+
+{% block body %}
+
+        <div class="page-header"><h1>{{ title_verb }} Category</h1></div>
+
+        <form method="POST" action="{% if action == 'newTag' %}{{ url_for('newTag') }}{% elif action == 'editTag' %}{{ url_for('editTag', tag_name=tag.name) }}{% endif %}">
+            {{ form.csrf_token }}
+            <div class="form-group{% if form.tag_name.errors %} has-error has-feedback{% endif %}">
+                {{ form.tag_name.label(class_="control-label") }}: {{ form.tag_name(class_="form-control") }}
+                {% if form.tag_name.errors %}
+                <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                <span class="control-label">{% for error in form.tag_name.errors %}{{ error }}<br>{% endfor %}</span>
+                {% endif %}
+            </div>
+            
+            {% if form.csrf_token.errors %}
+            <div class="alert alert-danger" role="alert">You have submitted an invalid CSRF token.</div>
+            {% endif %}
+
+            <div><input type="submit" value="Submit" class="btn btn-default"></div>
+        </form>
+
+{% endblock %} 

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block head_scripts %}
+
+        <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+        <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+        <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+        <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+
+{% endblock %}
+
+{% block body %}
+        <div class="page-header"><h1>Sign in with Google+</h1></div>
+
+        {{ form.csrf_token }}
+
+        <!-- GOOGLE PLUS SIGN IN BUTTON-->  
+          <div id="signInButton">
+          <span class="g-signin"
+            data-scope="openid email"
+            data-clientid="{{ client_id }}"
+            data-redirecturi="postmessage"
+            data-accesstype="offline"
+            data-cookiepolicy="single_host_origin"
+            data-callback="signInCallback"
+            data-approvalprompt="force">
+          </span>
+        </div>
+        <!--END GOOGLE PLUS SIGN IN BUTTON -->
+        <div id="result" class="alert alert-success login-hidden-error"></div>
+
+        <div id="error" class="alert alert-danger login-hidden-error"></div>
+
+{% endblock %}
+
+{% block end_scripts %}
+        <script>
+        var redirect_next = '{{ next }}'
+
+        function signInCallback(authResult) {
+            if (authResult['code']) {
+                // Hide the sign-in button now that the user is authorized
+                $('#signInButton').attr('style', 'display: none');
+                // Send the one-time-use code to the server, along with the CSRF token
+                // if the server responds, write a 'login successful' message to the web page and then redirect back to the main page
+                var csrf_token = $('#csrf_token').val()
+                var data = $.param({
+                    'code': authResult['code'],
+                    'csrf_token': csrf_token,
+                }) // encode data to simulate a form request so we can use the WTForms functionality
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect',
+                    //processData: false,
+                    dataType: 'json',
+                    data: data,
+                    //contentType: 'application/octet-stream; charset=utf-8',
+                    contentType: 'application/x-www-form-urlencoded', // contentType of normal form submission
+                    success: function(result) {
+                        // Handle or verify the server response if necessary.
+                        if (result) {
+                            console.log("Success!")
+                            $('#result').attr('style', 'display: block')
+                                        .html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                            setTimeout(function() {
+                                window.location.href = redirect_next;
+                            }, 4000);   
+                        } else if (authResult['error']) {
+                            console.log('There was an error: ' + authResult['error']);
+                        } else {
+                            $('#error').attr('style', 'display: block')
+                                       .html('Failed to make a server-side call. Check your configuration and console.');
+                        }
+                    },
+                    error: function(request, status, exc) {
+                        $('#error').attr('style', 'display: block')
+                                   .html("Error " + request.status + ": " + request.responseText);
+                    }, 
+                });
+            }
+        }
+        </script>
+{% endblock %}

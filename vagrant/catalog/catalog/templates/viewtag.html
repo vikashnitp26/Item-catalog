@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Category: {{ tag.name }}{% endblock %}
+
+{% block body %}
+
+        <div class="page-header"><h1>Category: {{ tag.name }}</h1></div>
+        <ul>
+        {% for item in tag.items %}
+            <li>
+                <a href="{{ url_for('viewItem', item_name=item.name, item_id=item.id) }}">{{ item.name }}</a>
+                {% if item.tags %}{% set comma = joiner(", ") %}
+                (
+                    {% for tag in item.tags %}
+                        {{- comma() }}<a href="{{ url_for('viewTag', tag_name=tag.name) }}">{{ tag.name }}</a>
+                    {%- endfor %}
+                )
+                {% endif %}
+            </li>
+        {% else %}
+            <li>No items here.</li>
+        {% endfor %}
+        </ul>
+
+        {% if logged_in and ((owner and user.activated) or user.admin) %}
+        <p>
+            <a href="{{ url_for('editTag', tag_name=tag.name) }}" class="btn btn-primary">Edit</a><br>
+            <a href="{{ url_for('deleteTag', tag_name=tag.name) }}" class="btn btn-primary">Delete</a>
+        </p>
+        {% endif %}
+
+{% endblock %}

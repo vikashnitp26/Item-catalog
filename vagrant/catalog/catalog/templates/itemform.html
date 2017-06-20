@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% if action == 'newItem' %}
+    {% set title_verb = 'New' %}
+{% elif action == 'editItem' %}
+    {% set title_verb = 'Edit' %}
+{% endif %}
+
+{% block title %}{{ title_verb }} Item{% endblock %}
+
+{% block body %}
+
+        <div class="page-header"><h1>{{ title_verb }} Item</h1></div>
+
+        <form method="POST" action="{% if action == 'newItem' %}{{ url_for('newItem') }}{% elif action == 'editItem' %}{{ url_for('editItem', item_name=item.name, item_id=item.id) }}{% endif %}">
+            {{ form.csrf_token }}
+            <div class="form-group{% if form.name.errors %} has-error has-feedback{% endif %}">
+                {{ form.name.label(class_="control-label") }}: {{ form.name(class_="form-control") }}
+                {% if form.name.errors %}
+                <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                <span class="control-label">{% for error in form.name.errors %}{{ error }}<br>{% endfor %}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group{% if form.description.errors %} has-error has-feedback{% endif %}">
+                {{ form.description.label(class_="control-label") }}: {{ form.description(class_="form-control") }}
+                {% if form.description.errors %}
+                <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                <span class="control-label">{% for error in form.description.errors %}{{ error }}<br>{% endfor %}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group{% if form.picture_url.errors %} has-error has-feedback{% endif %}">
+                {{ form.picture_url.label(class_="control-label") }}: {{ form.picture_url(class_="form-control") }}
+                {% if form.picture_url.errors %}
+                <span class="glyphicon glyphicon-remove form-control-feedback"></span>
+                <span class="control-label">{% for error in form.picture_url.errors %}{{ error }}<br>{% endfor %}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.tags.label(class_="control-label") }}: {{ form.tags(class_="form-control") }}
+            </div>
+            
+            
+            {% if form.csrf_token.errors %}
+            <div class="alert alert-danger" role="alert">You have submitted an invalid CSRF token</div>
+            {% endif %}
+
+            <div><input type="submit" value="Submit" class="btn btn-default"></div>
+        </form>
+
+{% endblock %} 

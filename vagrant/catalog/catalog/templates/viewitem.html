@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Item: {{ item.name }}{% endblock %}
+
+{% block body %}
+
+        
+        <div class="page-header"><h1>Item: {{ item.name }}</h1></div>
+
+        <div class="row">            
+            <div class="col-md-4">
+                {% if item.picture_url %}
+                <p><img src="{{ item.picture_url }}" class="img-responsive img-rounded"></p>
+                {% else %}
+                <p>No image.</p>
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+
+                <p>
+                {% for tag in item.tags %}
+                    <a href="{{ url_for('viewTag', tag_name=tag.name) }}" class="label label-info">{{ tag.name }}</a></li>
+                {% endfor %}
+                </p>
+
+                {% if item.description %}
+                <p>{{ item.description }}</p>
+                {% else %}
+                <p>No description.</p>
+                {% endif %}
+
+                {% if logged_in and ((owner and user.activated) or user.admin) %}
+                <p>
+                    <a href="{{ url_for('editItem', item_name=item.name, item_id=item.id) }}" class="btn btn-primary">Edit</a>
+                    <a href="{{ url_for('deleteItem', item_name=item.name, item_id=item.id) }}" class="btn btn-primary">Delete</a>
+                </p>
+                {% endif %}
+        
+            </div>
+        </div>
+
+{% endblock %}

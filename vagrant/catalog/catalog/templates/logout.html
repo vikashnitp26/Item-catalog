@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Logout{% endblock %}
+
+{% block body %}
+        <div class="page-header"><h1>Sign out?</h1></div>
+
+        <div id="signOutButton">
+          <span class="btn btn-default">Sign out</span>
+        </div>
+
+        <div id="result" class="alert alert-success login-hidden-error"></div>
+
+        <div id="error" class="alert alert-danger login-hidden-error"></div>
+
+{% endblock %}
+
+{% block end_scripts %}
+        <script>
+
+        $('#signOutButton').click(function(){
+            $.ajax({
+                url: "{{ url_for('gdisconnect') }}",
+                success: function(result) {
+                    $('#signOutButton').attr('style', 'display: none');
+                    $('#result').attr('style', 'display: block')
+                                .html('Logout Successful!</br>'+ result + '</br>Redirecting...');
+                    setTimeout(function() {
+                        window.location.href = "{{ url_for('index') }}";
+                    }, 4000);   
+                },
+                error: function(xhr) {
+                    $('#signOutButton').attr('style', 'display: none');
+                    $('#error').attr('style', 'display: block')
+                               .html('Error.</br>'+ JSON.parse(xhr.responseText) + '</br>Redirecting...');
+                    setTimeout(function() {
+                        window.location.href = "{{ url_for('index') }}";
+                    }, 4000);
+                },
+            })
+        });
+
+        </script>
+{% endblock %}
